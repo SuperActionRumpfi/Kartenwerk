@@ -1,0 +1,5 @@
+# Public search-engine crawling is allowed.
+User-agent: *
+Allow: /
+
+Sitemap: https://kartenwerk.manuel-rumpfhuber.workers.dev/sitemap.xml

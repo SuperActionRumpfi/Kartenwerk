@@ -1,0 +1,11 @@
+{
+  "name": "kartenwerk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test --test-isolation=none tests/core.test.cjs tests/catalogue.test.cjs tests/rate-limit.test.cjs",
+    "deploy": "wrangler deploy",
+    "deploy:check": "wrangler deploy --dry-run --outdir .deploy-check"
+  },
+  "devDependencies": { "wrangler": "4.166.0" }
+}

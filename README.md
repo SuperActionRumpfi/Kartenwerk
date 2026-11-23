@@ -34,3 +34,7 @@ Unabhängiges Fanprojekt für private Testspiele.
 Nicht mit Wizards of the Coast oder Scryfall verbunden.
 Kartenbilder und Kartendaten stammen von Scryfall;
 die jeweiligen Rechte verbleiben bei ihren Inhabern.
+
+## Deployment
+
+Updates to `main` are tested and deployed to the existing Cloudflare Worker `kartenwerk` with Wrangler. Setup instructions: [GITHUB-SETUP.md](GITHUB-SETUP.md). Developer notes: [DEVELOPMENT.md](DEVELOPMENT.md).
