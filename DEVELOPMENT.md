@@ -1,54 +1,15 @@
-# Kartenwerk: German card catalogue
+# Kartenwerk development
 
-The website now matches English and German card names using a static catalogue generated from Scryfall bulk data. Normal catalogue searches do not call the Scryfall API. Images still load from Scryfall's image service. Live API lookup remains a selectable fallback.
+Kartenwerk is a static browser application. There is no bundled card database, catalogue generator or catalogue refresh task. `dist/live.js` resolves names directly through the Scryfall API, using combined German-first searches and optional English fallback for missing German matches. Specific printing hints and ambiguous tokens are checked separately. All result pages are consumed; alternative editions load on demand.
 
-## Put it on Cloudflare
+Successful API responses are cached in the browser for 24 hours. This small response cache is not a maintained card database. Saved decks and print settings remain at the same origin; old lookup-mode preferences are ignored. Images still load from Scryfall. Network failures do not count as missing German cards.
 
-Extract `kartenwerk-catalogue-site.zip` and upload **all its contents**, including `index.html`, JavaScript, CSS, and the complete `data` folder, as a new deployment of your existing website. Uploading only the HTML no longer suffices. The site requires static hosting only: no Functions, Worker server logic, database binding, API key, or paid storage service.
+Requests are spaced by one second; 429 responses trigger at least 30 seconds of backoff or the longer Retry-After value. Cancellation and request timeouts remain available. Scryfall's official guidance at https://scryfall.com/docs/api/rate-limits recommends bulk data for rapid card-name lookups or large image-resolution workloads; this implementation does not represent an exemption or approval from Scryfall.
 
-Existing deck lists in browser storage remain available at the same website origin. English fallback is opt-in. Cards with no usable German image are identified separately from catalogue loading failures. Editions are selected from catalogue data. A missing alias means it was absent from this catalogue snapshot, not proof the card does not exist.
+## Run and check
 
-The names index and a default-printing index are loaded once. Alternative editions are fetched only when requested, or when an input line specifies an edition. Up to four catalogue sections load concurrently. Completed cards appear progressively. The current names index is about 4.3 MiB and the default-printing index about 20.7 MiB uncompressed; hosting compression reduces transfer size. The full data directory is about 101 MiB uncompressed, but normal deck lookup does not download every file. Files carry a versioned path so browser caching cannot mix catalogue versions. Only metadata and image links are hosted, not card pictures. First-load performance depends on catalogue downloads and network speed.
+Serve `dist` over HTTP (for example START-WINDOWS.cmd), or use your static server. Node.js 24: `npm ci`, `npm test`, `npm run deploy:check`. No Python or database build is required.
 
-## Local testing on Windows
+GitHub Actions runs `scripts/remove-catalogue.cjs` before checks and deployment so obsolete catalogue files left by additive browser uploads are excluded from deployment. It also removes retired catalogue tests from the runner. It does not commit deletions back to GitHub. Delete the paths listed in that script from the repository to finish source cleanup; previous Git history is retained.
 
-Install Python 3 if needed, then double-click `START-WINDOWS.cmd` in the source package and open http://localhost:8000. For catalogue mode, open over HTTP rather than double-clicking an HTML file. The source package must contain the generated `dist/data` folder or you must build it first.
-
-## Refresh the catalogue
-
-Python 3.12 or newer, no extra packages:
-
-```
-python scripts/build_catalogue.py --output dist/data
-```
-
-This downloads Scryfall's `all_cards` export (currently hundreds of megabytes compressed) and streams it into a temporary SQLite database, retaining English/German paper cards, exact name mappings, usable printings, and image URLs. It supports compressed JSON Lines and older JSON arrays. The full export and temporary database are deleted after building. A failed build does not replace the previous manifest. Upload the refreshed site including its data directory afterwards. Avoid running the builder repeatedly; weekly refresh is enough for a playgroup.
-
-To build from an already downloaded export:
-
-```
-python scripts/build_catalogue.py --input all-cards.jsonl.gz --output dist/data
-```
-
-`.github/workflows/catalogue.yml` provides a manual and weekly GitHub Actions build. If you put the source in your own GitHub repository, the run produces a `kartenwerk-website` artifact ready for upload. It does not automatically deploy to Cloudflare. No account or repository has been created by this work.
-
-## Checks
-
-```
-python -m unittest discover -s tests -p "*_test.py"
-node --test --test-isolation=none tests/core.test.cjs tests/catalogue.test.cjs tests/rate-limit.test.cjs
-```
-
-Independent fan project. Not endorsed by Wizards of the Coast or Scryfall. Users and hosts remain responsible for applicable usage terms and image rights.
-
-
-## Search metadata (9 November 2026)
-
-The initial HTML includes a descriptive title, summary, canonical URL, application structured data and a visible printing FAQ. robots.txt references sitemap.xml. Keep the Google verification HTML and social-preview.png in deployments. Change all absolute metadata and sitemap URLs together if moving hosts. See SEO-REVIEW.md in the source package for the comparison and limitations.
-
-
-## Token and emblem examples (9 November 2026)
-
-The bundled catalogue already contains Robot and other token printings. Lookup now uses an explicit set code and collector number to distinguish different token identities sharing a name. For example, `2 Robot (T40K) 23` selects the 3/3 Robot, while `1 Treasure (TSPM) 7` selects that Treasure printing. If a name remains ambiguous, the app asks for a set and number rather than choosing another token. English-only tokens/emblems require the English fallback checkbox. The optional live mode also checks explicit set/collector inputs before its name search.
-
-The example button now demonstrates two simple cards, Robot and Treasure tokens, Wrenn and Six and Teferi emblems, Mystical Archive Lightning Bolt (STA 42), and a Kamigawa: Neon Dynasty land (NEO 291). Comments in the example explain each input. All eight entries (nine copies) resolve in the bundled catalogue with English fallback enabled. The card database snapshot itself has not been refreshed; these entries were already present.
+The workflow stamps the actual GITHUB_SHA into an HTML comment before deploying the existing kartenwerk Worker. Local fonts, SEO text/metadata, the advanced sample, 63 × 88 mm sizing and full-sheet cutting guides are preserved.

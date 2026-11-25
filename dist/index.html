@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#193f34">
-  <meta name="description" content="Deutsche Magic-Proxies kostenlos drucken: Deckliste einfügen, verfügbare deutsche Editionen wählen und A4- oder Letter-Druckbögen im Browser als PDF speichern.">
+  <meta name="description" content="Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.">
   <title>Deutsche MTG-Proxies drucken &amp; als PDF speichern | Kartenwerk</title>
   <link rel="canonical" href="https://kartenwerk.manuel-rumpfhuber.workers.dev/">
   <meta name="robots" content="max-image-preview:large">
@@ -14,7 +14,7 @@
   <meta property="og:locale" content="de_AT">
   <meta property="og:url" content="https://kartenwerk.manuel-rumpfhuber.workers.dev/">
   <meta property="og:title" content="Deutsche MTG-Proxies drucken | Kartenwerk">
-  <meta property="og:description" content="Deutsche Magic-Proxies kostenlos drucken: Deckliste einfügen, verfügbare deutsche Editionen wählen und A4- oder Letter-Druckbögen im Browser als PDF speichern.">
+  <meta property="og:description" content="Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.">
   <meta property="og:image" content="https://kartenwerk.manuel-rumpfhuber.workers.dev/social-preview.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
@@ -22,13 +22,89 @@
   <meta property="og:image:alt" content="Kartenwerk: Deutsche MTG-Proxies drucken und Druckbögen als PDF speichern">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Deutsche MTG-Proxies drucken | Kartenwerk">
-  <meta name="twitter:description" content="Deutsche Magic-Proxies kostenlos drucken: Deckliste einfügen, verfügbare deutsche Editionen wählen und A4- oder Letter-Druckbögen im Browser als PDF speichern.">
+  <meta name="twitter:description" content="Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.">
   <meta name="twitter:image" content="https://kartenwerk.manuel-rumpfhuber.workers.dev/social-preview.png">
   <meta name="twitter:image:alt" content="Kartenwerk: Deutsche MTG-Proxies drucken und Druckbögen als PDF speichern">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style id="local-fonts">
+/* DM Sans — latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(fonts/dm-sans-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* DM Sans — latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(fonts/dm-sans-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Manrope — cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-cyrillic-ext.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* Manrope — cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Manrope — greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-greek.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* Manrope — vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-vietnamese.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* Manrope — latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Manrope — latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(fonts/manrope-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+  </style>
   <link rel="stylesheet" href="style.css">
   <script src="core.js" defer></script>
-  <script src="catalogue.js" defer></script>
+  <script src="live.js" defer></script>
   <script src="app.js" defer></script>
   <script type="application/ld+json">
 {
@@ -40,7 +116,8 @@
       "url": "https://kartenwerk.manuel-rumpfhuber.workers.dev/",
       "name": "Kartenwerk",
       "inLanguage": "de",
-      "description": "Deutsche Magic-Proxies kostenlos drucken: Deckliste einfügen, verfügbare deutsche Editionen wählen und A4- oder Letter-Druckbögen im Browser als PDF speichern."
+      "description": "Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.",
+      "sameAs": "https://github.com/SuperActionRumpfi/Kartenwerk"
     },
     {
       "@type": "WebApplication",
@@ -52,7 +129,7 @@
       "operatingSystem": "Any",
       "browserRequirements": "Requires JavaScript and an internet connection.",
       "isAccessibleForFree": true,
-      "description": "Deutsche Magic-Proxies kostenlos drucken: Deckliste einfügen, verfügbare deutsche Editionen wählen und A4- oder Letter-Druckbögen im Browser als PDF speichern.",
+      "description": "Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.",
       "image": "https://kartenwerk.manuel-rumpfhuber.workers.dev/social-preview.png",
       "offers": {
         "@type": "Offer",
@@ -62,11 +139,35 @@
       "featureList": [
         "Deutsche und englische MTG-Kartennamen in Decklisten",
         "Verfügbare deutsche Druckversionen und optionale englische Ersatzkarten",
+        "Token und Planeswalker-Embleme als separate Listeneinträge",
         "Editionsauswahl",
         "A4- und US-Letter-Druckbögen mit 63 × 88 mm großen Kartenseiten",
         "PDF-Speicherung über den Browser-Druckdialog",
         "Zusätzliche Rückseiten doppelseitiger Karten"
-      ]
+      ],
+      "mainEntityOfPage": {
+        "@id": "https://kartenwerk.manuel-rumpfhuber.workers.dev/#webpage"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://kartenwerk.manuel-rumpfhuber.workers.dev/#webpage",
+      "url": "https://kartenwerk.manuel-rumpfhuber.workers.dev/",
+      "name": "Deutsche MTG-Proxies drucken & als PDF speichern | Kartenwerk",
+      "description": "Deutsche MTG-Proxies aus Decklisten drucken: Karten, Token und Embleme auswählen, A4- oder Letter-Druckbögen erstellen und als PDF speichern. Kostenlos.",
+      "inLanguage": "de",
+      "isPartOf": {
+        "@id": "https://kartenwerk.manuel-rumpfhuber.workers.dev/#website"
+      },
+      "mainEntity": {
+        "@id": "https://kartenwerk.manuel-rumpfhuber.workers.dev/#app"
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://kartenwerk.manuel-rumpfhuber.workers.dev/social-preview.png",
+        "width": 1200,
+        "height": 630
+      }
     }
   ]
 }
@@ -113,10 +214,10 @@
         <p class="field-help" id="deck-help">Auch mit Set und Sammlernummer: <code>1 Sol Ring (CMM) 396</code>. Eine angegebene Edition wird bevorzugt, sofern auf Deutsch verfügbar. Bei gleichnamigen Token sind Set und Nummer nötig, etwa <code>1 Robot (TPIP) 16</code>. Token und Embleme benötigen oft „Englisch als Ersatz erlauben“.</p>
         <div class="editor-actions"><button id="example" class="text-button" type="button">✦ Beispiel mit Token &amp; Sonderdrucken laden</button><label class="file-button" for="import">Datei importieren ↥</label><input id="import" type="file" accept=".txt,.csv,.dec,text/plain" hidden></div>
         <div class="separator"></div>
-        <label for="lookup-mode">Kartensuche</label><select id="lookup-mode"><option value="catalogue">Katalog · schnell</option><option value="live">Scryfall live · langsam</option></select><p class="field-help" id="catalogue-info">Der Katalog wird vom Betreiber aus Scryfall-Daten erstellt. Bilder laden weiterhin aus dem Internet.</p>
+        <p class="field-help">Wir suchen direkt bei Scryfall nach deutschen Druckversionen. Englische Ersatzkarten werden nur gesucht, wenn du sie erlaubst.</p>
         <label class="option"><input type="checkbox" id="fallback"><span><strong>Englisch als Ersatz erlauben</strong><small>Nur wenn keine deutsche Druckversion gefunden wird.</small></span></label>
         <button id="resolve" class="primary full" type="button">Deutsche Karten finden <span>→</span></button>
-        <p class="local-note"><span aria-hidden="true">⌁</span> Deine Liste bleibt in diesem Browser. Nur im Live-Modus werden Kartennamen an Scryfall gesendet.</p>
+        <p class="local-note"><span aria-hidden="true">⌁</span> Deine Deckliste wird in diesem Browser gespeichert. Zur Kartensuche werden die eingegebenen Kartennamen an Scryfall gesendet.</p>
       </section>
 
     <section class="print-panel panel" aria-labelledby="print-title"><div><span class="section-number">03 / AB AUFS PAPIER</span><h2 id="print-title">Bereit für den Spieleabend?</h2><p id="print-summary">9 Karten pro Seite. In Originalgröße und mit Schnittlinien.</p></div><div class="print-controls"><label>Papier<select id="paper"><option value="a4">A4</option><option value="letter">US Letter</option></select></label><label class="compact-option"><input id="backs" type="checkbox" checked> Rückseiten doppelseitiger Karten</label><label class="compact-option"><input id="guides" type="checkbox" checked> Schnittlinien</label><button id="print" class="primary" type="button" disabled>Drucken / PDF <span>↗</span></button></div></section>
@@ -135,20 +236,29 @@
 
 
     <section id="anleitung" class="instructions"><div><span class="section-number">KLEINE LISTE. GROSSER SPIELEABEND.</span><h2>Drei Schritte zu deinem Deck.</h2></div><article><b>01</b><h3>Liste rein.</h3><p>Kopiere deine Deckliste oder importiere eine Textdatei. Beide Sprachen sind willkommen.</p></article><article><b>02</b><h3>Deutsch auswählen.</h3><p>Prüfe die Treffer und wähle deine Lieblingsedition. Fehlende Karten werden deutlich markiert.</p></article><article><b>03</b><h3>Drucken. Spielen.</h3><p>Drucke den Bogen aus, schneide die Karten zu und stecke sie mit einer normalen Karte in eine Hülle.</p></article></section>
-    <section class="faq panel" aria-labelledby="faq-title">
+    <section id="token-embleme" class="faq panel" aria-labelledby="token-title">
+      <span class="section-number">TOKEN, EMBLEME UND SONDERDRUCKE</span>
+      <h2 id="token-title">MTG-Token und Planeswalker-Embleme drucken</h2>
+      <p class="faq-intro">Ergänze benötigte Spielsteine und Embleme als eigene Zeilen in deiner Deckliste. Kartenwerk fügt sie nicht automatisch anhand deiner Kreaturen oder Planeswalker hinzu. Du kannst sie zusammen mit deinen anderen Karten auf A4 oder US Letter drucken und als PDF speichern.</p>
+      <details><summary>Wie finde ich den richtigen Token?</summary><p>Verschiedene Spielsteine können denselben Namen haben. Gib deshalb Set-Code und Sammlernummer an, zum Beispiel <code>2 Robot (TPIP) 16</code>. Prüfe das Kartenbild in der Vorschau: Name allein unterscheidet weder Werte noch Fähigkeiten. Wenn kein deutsches Bild verfügbar ist, aktiviere bei Bedarf „Englisch als Ersatz erlauben“.</p></details>
+      <details><summary>Wie drucke ich ein Planeswalker-Emblem?</summary><p>Trage das Emblem separat ein, zum Beispiel <code>1 Wrenn and Six Emblem</code>. Ein Planeswalker-Eintrag allein fügt sein Emblem nicht hinzu. Manche Embleme sind nur mit englischem Kartenbild verfügbar und benötigen die englische Ersatzoption.</p></details>
+      <details><summary>Kann ich eine bestimmte Edition oder ein anderes Kartenbild wählen?</summary><p>Ergänze zum Beispiel <code>1 Lightning Bolt (STA) 42</code> oder <code>1 Forest (NEO) 291</code>. Die angegebene Druckversion wird bevorzugt, sofern sie in der gewünschten Sprache verfügbar ist. Über „Weitere Editionen laden“ kannst du verfügbare Alternativen prüfen. Kontrolliere vor dem Druck die gewählte Edition und Sprache.</p></details>
+      <p class="faq-intro">Bereit? <a href="#deck">Deckliste einfügen</a> oder die <a href="#anleitung">Druckanleitung ansehen</a>.</p>
+    </section>
+    <section id="haeufige-fragen" class="faq panel" aria-labelledby="faq-title">
       <span class="section-number">FRAGEN ZUM PROXY-DRUCK</span>
       <h2 id="faq-title">Deutsche Magic-Proxies drucken: häufige Fragen</h2>
       <p class="faq-intro">Was du über deutsche Kartenbilder, Decklisten und das Drucken als PDF wissen solltest.</p>
       <details><summary>Wie erstelle ich deutsche MTG-Proxies aus einer Deckliste?</summary><p>Füge deine Deckliste ein und klicke auf „Deutsche Karten finden“. Kartenwerk ordnet die Namen den verfügbaren deutschen Papierdruckversionen zu. Prüfe die Vorschau und wähle bei Bedarf über „Weitere Editionen laden“ ein anderes Kartenbild. Anschließend kannst du den Druckbogen ausgeben.</p></details>
-      <details><summary>Kann ich englische oder deutsche Kartennamen eingeben?</summary><p>Ja. Der Katalog enthält Zuordnungen für englische und offizielle deutsche Kartennamen. Pro Zeile kannst du eine Anzahl und einen Namen angeben, zum Beispiel „1 Sol Ring“. Set-Code und Sammlernummer sind optional. Ein Auftrag darf höchstens 300 Karten enthalten.</p></details>
-      <details><summary>Warum gibt es für manche Magic-Karten kein deutsches Bild?</summary><p>Nicht jede Karte oder Edition wurde auf Deutsch veröffentlicht. Zusätzlich kann ein deutscher Scan fehlen oder eine neue Karte noch nicht im Katalog enthalten sein. Kartenwerk zeigt fehlende Treffer an. Mit „Englisch als Ersatz erlauben“ kannst du verfügbare englische Druckversionen verwenden. Kartenwerk erzeugt keine eigenen Übersetzungen oder Kartenbilder.</p></details>
+      <details><summary>Kann ich englische oder deutsche Kartennamen eingeben?</summary><p>Ja. Du kannst englische und offizielle deutsche Kartennamen verwenden. Die Suche fragt verfügbare Druckversionen direkt bei Scryfall ab. Pro Zeile kannst du eine Anzahl und einen Namen angeben, zum Beispiel „1 Sol Ring“. Set-Code und Sammlernummer sind optional. Ein Auftrag darf höchstens 300 Karten enthalten.</p></details>
+      <details><summary>Warum gibt es für manche Magic-Karten kein deutsches Bild?</summary><p>Nicht jede Karte oder Edition wurde auf Deutsch veröffentlicht. Zusätzlich kann ein deutscher Scan fehlen oder eine neue Karte noch nicht bei Scryfall erfasst sein. Auch bei der direkten Suche muss ein deutscher Druck mit Kartenbild vorhanden sein. Kartenwerk zeigt fehlende Treffer an. Mit „Englisch als Ersatz erlauben“ kannst du verfügbare englische Druckversionen verwenden. Kartenwerk erzeugt keine eigenen Übersetzungen oder Kartenbilder.</p></details>
       <details><summary>Wie speichere ich die Proxies als PDF?</summary><p>Klicke auf „Drucken / PDF“ und wähle im Druckdialog deines Browsers „Als PDF speichern“ oder einen PDF-Drucker. Wähle dieselbe Papiergröße wie in Kartenwerk, stelle 100 % beziehungsweise tatsächliche Größe ein und deaktiviere Kopf- und Fußzeilen.</p></details>
       <details><summary>Welche Größe haben die Karten und Druckbögen?</summary><p>Die Kartenseiten sind 63 × 88 mm groß. Auf einen A4- oder US-Letter-Druckbogen passen bis zu neun Kartenseiten. Optionale Schnittlinien helfen beim Ausschneiden. Miss vor dem Druck des ganzen Decks einen Testausdruck nach, da Druckereinstellungen die Skalierung verändern können.</p></details>
       <details><summary>Wie werden doppelseitige Karten gedruckt?</summary><p>Wenn die Option für Rückseiten aktiviert ist, fügt Kartenwerk die verfügbaren Rückseiten als zusätzliche Kartenseiten zum Ausschneiden hinzu. Es handelt sich nicht um einen automatisch ausgerichteten Duplexdruck.</p></details>
       <details><summary>Ist Kartenwerk kostenlos und wofür sind die Ausdrucke gedacht?</summary><p>Kartenwerk ist kostenlos und erfordert kein Benutzerkonto. Die Ausdrucke sind für private Testspiele gedacht und ersetzen keine autorisierten Turnierkarten. Sprecht die Verwendung mit eurer Spielrunde ab. Kartenwerk ist ein unabhängiges Fanprojekt; die Rechte an Kartendaten und Bildern verbleiben bei den jeweiligen Rechteinhabern.</p></details>
     </section>
   </main>
-  <footer class="wrap footer"><a class="brand" href="./">kartenwerk<span class="brand-dot">.</span></a><p>Ein unabhängiges Fanprojekt für private Testspiele.<br>Nicht mit Wizards of the Coast oder Scryfall verbunden. Keine Turnierkarten.</p><span>Mit Liebe zum Küchentisch. ✦</span></footer>
+  <footer class="wrap footer"><a class="brand" href="./">kartenwerk<span class="brand-dot">.</span></a><p>Ein unabhängiges Fanprojekt für private Testspiele.<br>Nicht mit Wizards of the Coast oder Scryfall verbunden. Keine Turnierkarten.<br><a href="https://github.com/SuperActionRumpfi/Kartenwerk">Quellcode auf GitHub</a></p><span>Mit Liebe zum Küchentisch. ✦</span></footer>
 </div>
 <div id="print-sheets" aria-hidden="true"></div>
 <style id="page-style">@page { size: A4 portrait; margin: 7mm; }</style>

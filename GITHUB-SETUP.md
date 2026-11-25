@@ -23,7 +23,7 @@ This package is repository source, not a Cloudflare dashboard-upload ZIP. Do not
 3. Choose Add file > Upload files.
 4. Drag the CONTENTS of the extracted folder into the upload area, preserving folders. The repository root must contain `wrangler.jsonc`, `package.json`, `package-lock.json`, `.github`, `dist`, `scripts` and `tests`. Do not nest everything inside another kartenwerk folder. Include dotfiles such as `.github` and `.gitignore`.
 5. Commit to main. This updates the existing README with its current text plus deployment links.
-6. If browser upload limits interfere, upload in batches, or use GitHub Desktop to clone the repository and commit the files. The JSON catalogue is already included; do not regenerate it during setup.
+6. If browser upload limits interfere, upload in batches, or use GitHub Desktop to clone the repository and commit the files. No catalogue files are needed.
 
 ## 3. Verify the first deployment
 
@@ -38,7 +38,7 @@ This package is repository source, not a Cloudflare dashboard-upload ZIP. Do not
 
 Commit site changes to main. GitHub runs tests, validates the Wrangler configuration and deploys automatically. Use a branch/pull request if you want checks before changing production. Do not also connect Cloudflare Builds to the same repository: choose this GitHub Actions workflow to avoid duplicate deployments.
 
-`wrangler.jsonc` declares the static asset directory, HTML/missing-page handling, existing Worker name, and observability settings. `_redirects` supplies the permanent homepage redirect. The existing catalogue refresh workflow builds a downloadable artifact; it does not commit or deploy catalogue updates automatically.
+`wrangler.jsonc` declares the static asset directory, HTML/missing-page handling, existing Worker name, and observability settings. `_redirects` supplies the permanent homepage redirect. The deployment workflow removes retired catalogue files from its checkout before tests and deployment. This does not commit deletions back to GitHub.
 
 The site remains static-assets-only. Enabling Worker logs does not guarantee logs for directly served static assets. No extra Worker code is introduced to force request logging. This migration does not guarantee Google indexing.
 

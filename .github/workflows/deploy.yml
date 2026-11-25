@@ -28,12 +28,12 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Remove retired catalogue from checkout
+        run: node scripts/remove-catalogue.cjs
       - run: npm ci
       - run: npm test
-      - run: python -m unittest discover -s tests -p '*_test.py'
+      - name: Add commit marker to HTML
+        run: node scripts/stamp-build.cjs
       - run: npm run deploy:check
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -46,6 +46,8 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - name: Remove retired catalogue from checkout
+        run: node scripts/remove-catalogue.cjs
       - run: npm ci
       - name: Check deployment credentials
         env:
@@ -54,6 +56,8 @@ jobs:
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Add CLOUDFLARE_API_TOKEN under repository Settings > Secrets and variables > Actions.'; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo 'Add CLOUDFLARE_ACCOUNT_ID under repository Settings > Secrets and variables > Actions.'; exit 1; }
+      - name: Add commit marker to HTML
+        run: node scripts/stamp-build.cjs
       - name: Deploy existing kartenwerk Worker
         run: npm run deploy
         env:

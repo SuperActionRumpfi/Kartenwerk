@@ -1,10 +1,9 @@
 'use strict';
 (() => {
-  const { parseDeck, normalize, faces, preferredPrinting, printItems, pages } = Kartenwerk;
+  const { parseDeck, faces, printItems, pages } = Kartenwerk;
   const $ = id => document.getElementById(id);
-  let rows = [], controller = null, busy = false, printing = false, dirty = false, lastRequest = 0;
-  const cache = new Map();
-  const catalogue = new KartenwerkCatalogue();
+  let rows = [], controller = null, busy = false, printing = false, dirty = false;
+  const live = new ScryfallLive({report: text => notice(text)});
   const example = [
     '# Zwei einfache Karten: englischer und deutscher Name',
     '1 Sol Ring',
@@ -29,113 +28,7 @@
   function save() { try { localStorage.setItem('kartenwerk-deck', $('deck').value); localStorage.setItem('kartenwerk-settings', JSON.stringify({ fallback: $('fallback').checked, paper: $('paper').value, backs: $('backs').checked, guides: $('guides').checked })); } catch {} }
   function inputCount() { const { total } = parseDeck($('deck').value); $('input-count').textContent = `${total} ${total === 1 ? 'Karte' : 'Karten'}`; }
   function changed() { save(); inputCount(); dirty = true; if (rows.length) { $('print').disabled = true; notice('Die Liste oder Spracheinstellung wurde geändert. Bitte „Deutsche Karten finden“ erneut anklicken.'); } }
-  function setBusy(value) { busy = value; for (const id of ['deck', 'fallback', 'resolve', 'example', 'import', 'lookup-mode']) $(id).disabled = value; $('progress').hidden = !value; $('print').disabled = value || dirty || !printItems(rows, $('backs').checked).length; }
-  function delay(ms, signal) { return new Promise((resolve, reject) => { if (signal?.aborted) return reject(new DOMException('Abgebrochen', 'AbortError')); const stop = () => { clearTimeout(timer); reject(new DOMException('Abgebrochen', 'AbortError')); }; const timer = setTimeout(() => { signal?.removeEventListener('abort', stop); resolve(); }, ms); signal?.addEventListener('abort', stop, { once: true }); }); }
-async function request(path, signal) {
-  const url = "https://api.scryfall.com" + path;
-  const sleep = typeof pause === "function" ? pause : delay;
-  const report = text => {
-    if (typeof status === "function") status(text);
-    else if (typeof notice === "function") notice(text);
-  };
-  if (signal.aborted) throw new DOMException("Abgebrochen", "AbortError");
-  if (cache.has(url)) return cache.get(url);
-
-  for (let attempt = 0; attempt < 4; attempt++) {
-    let until = request.nextAt || 0;
-    try {
-      until = Math.max(until, Number(localStorage.getItem("kartenwerk-api-pause")) || 0);
-    } catch {}
-    await sleep(Math.max(0, until - Date.now()), signal);
-    const controller = new AbortController();
-    const stop = () => controller.abort();
-    signal.addEventListener("abort", stop, { once: true });
-    if (signal.aborted) controller.abort();
-    let timedOut = false, response;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      controller.abort();
-    }, 20000);
-    try {
-      response = await fetch(url, {
-        signal: controller.signal,
-        headers: { Accept: "application/json" }
-      });
-    } catch (error) {
-      if (signal.aborted) throw new DOMException("Abgebrochen", "AbortError");
-      throw new Error(timedOut
-        ? "Scryfall antwortet nicht innerhalb von 20 Sekunden."
-        : "Scryfall-Verbindung fehlgeschlagen: " + error.message);
-    } finally {
-      clearTimeout(timer);
-      signal.removeEventListener("abort", stop);
-      request.nextAt = Date.now() + 1000;
-    }
-
-    if (response.status === 429 || response.status >= 500) {
-      const header = response.headers.get("Retry-After");
-      let retryMs = 0;
-      if (header !== null) {
-        const seconds = Number(header);
-        retryMs = Number.isFinite(seconds)
-          ? seconds * 1000 : Date.parse(header) - Date.now();
-      }
-      const waitMs = Math.max(15000 * 2 ** attempt, retryMs || 0);
-      request.nextAt = Date.now() + waitMs;
-      try {
-        localStorage.setItem("kartenwerk-api-pause", String(request.nextAt));
-      } catch {}
-      if (attempt === 3) {
-        const error = new Error("Scryfall lehnt weitere Anfragen ab (HTTP " +
-          response.status + "). Suche pausiert; Karten sind nicht als fehlend bestätigt. " +
-          "Bitte später erneut versuchen.");
-        error.rateLimited = true;
-        throw error;
-      }
-      report("Scryfall meldet HTTP " + response.status + ". Die gesamte Suche " +
-        "wartet mindestens " + Math.ceil(waitMs / 1000) + " Sekunden. " +
-        "Danach wird dieselbe Anfrage wiederholt. Abbrechen bleibt möglich.");
-      continue;
-    }
-    if (response.status === 404) {
-      cache.set(url, null);
-      return null;
-    }
-    if (!response.ok) throw new Error("Scryfall meldet HTTP " + response.status);
-    const data = await response.json();
-    cache.set(url, data);
-    return data;
-  }
-}
-
-  async function search(query, signal) {
-    const data = await request(`/cards/search?${new URLSearchParams({ q: query, unique: 'prints', order: 'released', dir: 'desc' })}`, signal);
-    return (data?.data || []).filter(card => faces(card).length);
-  }
-  async function resolve(entry, signal) {
-    let canonical = null;
-    if (entry.set && entry.collector) {
-      const printing = await request(`/cards/${encodeURIComponent(entry.set)}/${encodeURIComponent(entry.collector)}`, signal);
-      if (printing && [printing.name, printing.printed_name, ...(printing.card_faces || []).flatMap(face => [face.name, face.printed_name])].filter(Boolean).some(name => normalize(name) === normalize(entry.name))) canonical = printing;
-    }
-    if (!canonical) canonical = await request(`/cards/named?${new URLSearchParams({ exact: entry.name })}`, signal);
-    if (!canonical) {
-      const escaped = entry.name.replace(/["\\]/g, ' ');
-      const candidates = await search(`lang:de game:paper "${escaped}"`, signal);
-      canonical = candidates.find(card => [card.name, card.printed_name, ...(card.card_faces || []).flatMap(face => [face.name, face.printed_name])].filter(Boolean).some(name => normalize(name) === normalize(entry.name)));
-      if (!canonical) return { ...entry, options: [], selected: null, error: 'Karte nicht gefunden. Namen und Schreibweise prüfen.' };
-    }
-    if (!canonical.oracle_id) return { ...entry, options: [], selected: null, error: 'Für diese Karte ist keine eindeutige Zuordnung verfügbar.' };
-    let options = await search(`oracleid:${canonical.oracle_id} lang:de game:paper`, signal);
-    let fallback = false;
-    if (!options.length && $('fallback').checked) {
-      options = await search(`oracleid:${canonical.oracle_id} lang:en game:paper`, signal);
-      fallback = true;
-    }
-    const selected = preferredPrinting(options, entry);
-    const mismatch = selected && entry.set && (selected.set !== entry.set || (entry.collector && selected.collector_number !== entry.collector));
-    return { ...entry, options, selected: selected?.id || null, fallback, mismatch, error: selected ? null : 'Keine deutsche Druckversion mit Bild gefunden.' };
-  }
+  function setBusy(value) { busy = value; for (const id of ['deck', 'fallback', 'resolve', 'example', 'import']) $(id).disabled = value; $('progress').hidden = !value; $('print').disabled = value || dirty || !printItems(rows, $('backs').checked).length; }
   function cardFor(row) { return row.options.find(card => card.id === row.selected); }
   function render() {
     $('empty').hidden = rows.length > 0; $('results').hidden = rows.length === 0;
@@ -160,10 +53,12 @@ async function request(path, signal) {
             more.disabled = true; more.textContent = 'Editionen laden …';
             const snapshot = rows;
             try {
-              const options = await catalogue.editions(row, new AbortController().signal);
+              controller = new AbortController(); setBusy(true); render();
+              const options = await live.editions(row, controller.signal);
               if (rows !== snapshot) return;
               row.options = options; row._editionsLoaded = true; render();
-            } catch (error) { more.disabled = false; more.textContent = 'Erneut versuchen'; notice(error.message); }
+            } catch (error) { notice(error.name === 'AbortError' ? 'Laden der Editionen abgebrochen.' : error.message); }
+            finally { controller = null; setBusy(false); render(); }
           });
           article.append(more);
         }
@@ -185,7 +80,6 @@ async function request(path, signal) {
   }
   $('deck').addEventListener('input', changed);
   $('fallback').addEventListener('change', changed);
-  $('lookup-mode').addEventListener('change', changed);
   $('example').addEventListener('click', () => { if ($('deck').value.trim() && !confirm('Aktuelle Deckliste durch das Beispieldeck ersetzen?')) return; $('deck').value = example; changed(); $('deck').focus(); });
   $('import').addEventListener('change', async event => {
     const file = event.target.files[0]; if (!file) return;
@@ -202,24 +96,9 @@ async function request(path, signal) {
     controller = new AbortController(); dirty = false; rows = parsed.entries.map(entry => ({ ...entry, options: [], selected: null, error: 'Noch nicht gesucht.' })); notice(''); setBusy(true); render(); $('progress-bar').max = parsed.entries.length; $('progress-bar').value = 0;
     let completed = 0, stopped = false;
     try {
-      if ($('lookup-mode').value === 'catalogue') {
-        $('progress-text').textContent = 'Katalog laden und Deck zuordnen …';
-        try {
-          const manifest = await catalogue.resolveAll(parsed.entries, $('fallback').checked, controller.signal,
-            (index, row) => { rows[index] = row; completed++; $('progress-bar').value = completed; render(); },
-            (done, total) => { $('progress-text').textContent = `Katalogpakete: ${done} / ${total}`; });
-          const date = manifest.source_updated_at || manifest.generated_at;
-          $('catalogue-info').textContent = `Scryfall-Katalog vom ${new Date(date).toLocaleDateString('de-DE')}. Deutsche Druckversionen und erlaubte englische Ersatzkarten werden lokal zugeordnet.`;
-        } catch (error) {
-          if (error.name === 'AbortError') throw error;
-          throw new Error('Katalog nicht vollständig verfügbar. Bitte die Website inklusive des erzeugten data-Ordners hochladen. Alternativ „Scryfall live · langsam“ wählen. Details: ' + error.message);
-        }
-      } else {
-        for (const entry of parsed.entries) {
-          $('progress-text').textContent = `${completed + 1} / ${parsed.entries.length} · ${entry.name}`;
-          rows[completed] = await resolve(entry, controller.signal); completed++; $('progress-bar').value = completed; render();
-        }
-      }
+      await live.resolveAll(parsed.entries, $('fallback').checked, controller.signal,
+        (index, row) => { rows[index] = row; completed++; $('progress-bar').value = completed; render(); },
+        message => { $('progress-text').textContent = message; });
     } catch (error) { stopped = true; notice(error.name === 'AbortError' ? `Suche abgebrochen. ${completed} von ${parsed.entries.length} Einträgen verarbeitet. Eine neue Suche beginnt mit der vollständigen Liste.` : error.message); }
     finally { controller = null; setBusy(false); render(); }
     if (!stopped) {
